@@ -15,6 +15,7 @@ def main():
 	print("date: " + timestr)
 
 	metadata = [['date', timestr], ['name', args.name], ['deep well barcode', args.barcode]]
+	
 	# the csv filename will be unique from scan time - confirm with Rafael how to decide filename
 	with open(timestr+'.csv', 'a', newline='') as csvFile:
 		writer = csv.writer(csvFile)
