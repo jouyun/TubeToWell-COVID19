@@ -23,8 +23,8 @@ class TubeToWell:
 		self.well_rows = [chr(x) for x in range(ord('A'), ord('H') + 1)] # move to state machine
 		# make a list of well names in column wise order 
 		self.well_names = []
-		for letter in self.well_rows:
-			for i in range(1,13):
+		for i in range(1,13):
+			for letter in self.well_rows:
 				self.well_names.append(letter+str(i))
 		self.well_names_iterator = iter(self.well_names)
 
@@ -42,7 +42,7 @@ class TubeToWell:
 
 	def checkBarcode(self, check_input):
 		print('barcode:' + check_input)
-		
+
 		# the user can only end the protocol by scanning the well plate again, however they cannot end the protocol if there were no tubes scanned
 		# while check_input != self.args.barcode or not self.scanned_tubes:
 			# find a way to make sure inputs came from barcode
@@ -54,13 +54,21 @@ class TubeToWell:
 			print('this tube was already scanned')
 			return False
 			# light up corresponding well
-		# write to csv if it is a new barcode
 		else: 
+			# write to csv if it is a new barcode
 			with open(self.timestr+'.csv', 'a', newline='') as csvFile:
-				row = [[check_input]]
+				# log scan time
+				scan_time = time.strftime("%Y%m%d-%H%M%S")
+				location = next(self.well_names_iterator)
+				row = [[scan_time, check_input, location]]
 				writer = csv.writer(csvFile)
 				writer.writerows(row)
-				self.scanned_tubes.append(check_input)
-				self.tube_locations[next(self.well_names_iterator)] = check_input
+
+			# add to barcode to scanned_tubes list
+			self.scanned_tubes.append(check_input)
+
+			# link barcode to a well location
+			self.tube_locations[location] = check_input
+			print (location)
 			return True
 
