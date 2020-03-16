@@ -9,7 +9,7 @@ import matplotlib as mpl
 A1_X = 0.23
 A1_Y = 0.41
 WELL_SPACING = 0.045
-CIRC_RADIUIS  = 0.026
+CIRC_RADIUIS  = 0.025
 
 
 class WellCircle:
@@ -38,19 +38,6 @@ class WellCircle:
 		self.circle.zorder=1
 		# return self.circle
 
-#circle coordinates
-def circleCoords(well_spacing, circ_radius):
-	# returns a list with all the points in the order to be accessed (column-wise)
-	ordered_points = []
-	for x in range(12):
-		x_coord = A1_X + well_spacing*x
-		for y in range(8):
-			y_coord = A1_Y - well_spacing*y
-			ordered_points.append((x_coord, y_coord))
-	return ordered_points
-	
-
-
 class PlateLighting:
 	def __init__(self, a1_x, a1_y, circ_radius, well_spacing):
 
@@ -64,7 +51,7 @@ class PlateLighting:
 		self.fig.canvas.manager.full_screen_toggle() # make sure to set the well lighting display as the main display (go to windows display setting)
 
 		# draw all the empty wells
-		self.wells = []
+		self.wells = [] # column wise list of wells
 		for x in range(12):
 			x_coord = a1_x + (well_spacing * x)
 			for y in range(8):
@@ -72,22 +59,16 @@ class PlateLighting:
 				well = WellCircle((x_coord,y_coord), circ_radius)
 				self.wells.append(well)
 				self.ax.add_artist(well.circle)
-		# print(self.wells)
-
-		# self.target_well_idx = 0
-		# self.target_well = self.wells[self.target_well_idx]
 		self.wells_iterator = iter(self.wells)
 
-		self.fig.canvas.mpl_connect('button_press_event', self.on_click)
+		self.fig.canvas.mpl_connect('key_press_event', self.on_trigger)
 
-	def on_click(self, event):
-		if event.inaxes is None:
-			return
-
-		target = next(self.wells_iterator)
-		target.markTarget()
-		self.fig.canvas.draw()
-		target.markFilled()
+	def on_trigger(self, event):
+		if event.key == 'enter':
+			target = next(self.wells_iterator)
+			target.markTarget()
+			self.fig.canvas.draw()
+			target.markFilled()
 
 	def show(self):
 		plt.show()
