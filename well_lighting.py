@@ -83,11 +83,11 @@ class PlateLighting:
 	def on_click(self, event):
 		if event.inaxes is None:
 			return
+
 		target = next(self.wells_iterator)
 		target.markTarget()
-		
-
 		self.fig.canvas.draw()
+		target.markFilled()
 
 	def show(self):
 		plt.show()
