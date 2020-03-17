@@ -1,0 +1,23 @@
+#:kivy 1.11.1
+#:import FigureCanvasKivyAgg kivy.garden.matplotlib.backend_kivyagg
+#:import plt matplotlib.pyplot
+
+
+<PLWidget>:
+	orientation: 'vertical'
+	BoxLayout:
+		orientation: 'horizontal'
+		size_hint_y: None
+		height: 180
+	    Label:
+	        text: 'Instructions'
+    	BoxLayout:
+    		size_hint_x: None
+    		width: 180
+		    orientation: 'vertical'
+		    TextInput:
+		    Button:
+		    	text: 'undo'
+		    Button:
+		    	text: 'new plate'
+	WellPlot:

@@ -13,7 +13,7 @@ class TargetCircle:
 		self.fig.tight_layout()
 		self.ax.axis('equal')
 		self.ax.axis('off')
-		self.fig.canvas.manager.full_screen_toggle()
+		# self.fig.canvas.manager.full_screen_toggle()
 
 
 
@@ -37,4 +37,4 @@ class TargetCircle:
 		plt.show()
 
 
-TargetCircle().show()
+# TargetCircle().show()

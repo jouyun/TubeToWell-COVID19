@@ -6,7 +6,7 @@ import time
 import matplotlib as mpl
 from tube_to_well import *
 
-# put this into a state machine later
+# TODO: put this into a state machine later
 # if layout changes, use lighting location to find A1 and spacing
 A1_X = 0.23
 A1_Y = 0.435
@@ -53,7 +53,7 @@ class PlateLighting:
 		self.ax.axis('equal')
 		self.fig.subplots_adjust(bottom=0)
 		self.ax.axis('off')
-		self.fig.canvas.manager.full_screen_toggle() # make sure to set the well lighting display as the main display (go to windows display setting)
+		# self.fig.canvas.manager.full_screen_toggle() # make sure to set the well lighting display as the main display (go to windows display setting)
 		self.well_dict = {}
 
 		# set up tube to well
@@ -104,7 +104,6 @@ class PlateLighting:
 
 	def show(self):
 		plt.show()
-
 
 # PlateLighting(A1_X, A1_Y, CIRC_RADIUIS, WELL_SPACING).show()
 def main():
