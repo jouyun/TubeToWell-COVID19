@@ -13,6 +13,7 @@ A1_Y = 0.435
 WELL_SPACING = 0.045
 CIRC_RADIUIS  = 0.023
 
+
 class Well:
 	def __init__(self, center, radius):
 		self.target = False
