@@ -12,6 +12,7 @@ class TargetCircle:
 		self.fig, self.ax = plt.subplots()
 		self.fig.tight_layout()
 		self.ax.axis('equal')
+		self.fig.subplots_adjust(bottom=0)
 		self.ax.axis('off')
 		self.fig.canvas.manager.full_screen_toggle()
 

@@ -40,7 +40,6 @@ class Well:
 		self.target = False
 		self.circle.set_color('blue')
 		self.circle.zorder=2
-				
 
 class PlateLighting:
 	def __init__(self, a1_x, a1_y, circ_radius, well_spacing):
