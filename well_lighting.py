@@ -24,7 +24,6 @@ class Well:
 	def markEmpty(self):
 		self.target = False
 		self.circle.set_color('green')
-		
 
 	def markFilled(self):
 		self.target = False

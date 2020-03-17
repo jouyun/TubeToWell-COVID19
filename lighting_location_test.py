@@ -15,8 +15,6 @@ class TargetCircle:
 		self.ax.axis('off')
 		# self.fig.canvas.manager.full_screen_toggle()
 
-
-
 		self.circ = Circle((0.25, 0.43), 0.026, color='red')
 		self.ax.add_artist(self.circ)
 		self.ax.set_title('Click to move the circle')

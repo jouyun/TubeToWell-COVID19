@@ -13,6 +13,8 @@ A1_Y = 0.435
 WELL_SPACING = 0.045
 CIRC_RADIUIS  = 0.023
 
+# TODO: Input controls 
+
 class Well:
 	def __init__(self, center, radius):
 		self.target = False
@@ -54,7 +56,7 @@ class PlateLighting:
 		self.fig.subplots_adjust(bottom=0)
 		self.ax.axis('off')
 		# self.fig.canvas.manager.full_screen_toggle() # make sure to set the well lighting display as the main display (go to windows display setting)
-		self.well_dict = {}
+		self.well_dict = {} # links barcode to Well object
 
 		# set up tube to well
 		self.ttw = TubeToWell()
@@ -70,37 +72,30 @@ class PlateLighting:
 				self.ax.add_artist(well.circle)
 		self.wells_iterator = iter(self.wells)
 
-		self.check_input = ''
-		self.fig.canvas.mpl_connect('key_press_event', self.on_trigger)
+		# self.check_input = ''
+		# self.fig.canvas.mpl_connect('key_press_event', self.on_trigger)
 
-	def on_trigger(self, event):
-		# compile the full barcode onto check_input
-		if event.key != 'enter':
-			self.check_input += event.key
-		if event.key == 'enter':
-			# check if it was a valid barcode (either have all the accessed barcodes or make sure input comes from a barcode scanner)
-			if self.ttw.checkBarcode(self.check_input):
-				target = next(self.wells_iterator)
-				target.markTarget()
-				target.barcode = self.check_input
-				self.fig.canvas.draw()
+	def switchWell(self, check_input):
+		if self.ttw.checkBarcode(check_input):
+			target = next(self.wells_iterator)
+			target.markTarget()
+			target.barcode = check_input
+			self.fig.canvas.draw()
 
-				# the well will be marked as filled when the next target is marked 
-				target.markFilled()
-				target.barcode = self.check_input
-				
-				self.well_dict[target.barcode] = target
+			# the well will be marked as filled when the next target is marked 
+			target.markFilled()
+			target.barcode = check_input
+			
+			self.well_dict[target.barcode] = target
 
-			elif self.check_input in self.ttw.scanned_tubes:
-				already_scanned_tube = self.well_dict[self.check_input]
-				print(already_scanned_tube)
-				already_scanned_tube.markRescanned()
-				self.fig.canvas.draw()
-				
-				# the well will be marked as filled when the next target is marked 
-				already_scanned_tube.markFilled()
-
-			self.check_input = ''
+		elif check_input in self.ttw.scanned_tubes:
+			already_scanned_tube = self.well_dict[check_input]
+			# print(already_scanned_tube)
+			already_scanned_tube.markRescanned()
+			self.fig.canvas.draw()
+			
+			# the well will be marked as filled when the next target is marked 
+			already_scanned_tube.markFilled()
 
 	def show(self):
 		plt.show()

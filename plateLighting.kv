@@ -10,14 +10,20 @@
 		size_hint_y: None
 		height: 180
 	    Label:
+	    	id: test_display
 	        text: 'Instructions'
     	BoxLayout:
     		size_hint_x: None
     		width: 180
 		    orientation: 'vertical'
 		    TextInput:
+		    	id: textbox
+		    	multiline: False
+		    	on_text_validate: root.switchWell()
+		    	focus: True
 		    Button:
 		    	text: 'undo'
 		    Button:
 		    	text: 'new plate'
 	WellPlot:
+		id: wellPlot
