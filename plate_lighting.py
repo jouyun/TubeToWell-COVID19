@@ -76,21 +76,22 @@ class PlateLighting:
 		# self.fig.canvas.mpl_connect('key_press_event', self.on_trigger)
 
 	def switchWell(self, check_input):
-		if self.ttw.checkBarcode(check_input):
+		location = self.ttw.checkBarcode(check_input)
+		if location:
 			target = next(self.wells_iterator)
 			target.markTarget()
+			target.location = location
 			target.barcode = check_input
 			self.fig.canvas.draw()
 
 			# the well will be marked as filled when the next target is marked 
 			target.markFilled()
-			target.barcode = check_input
 			
 			self.well_dict[target.barcode] = target
 
+
 		elif check_input in self.ttw.scanned_tubes:
 			already_scanned_tube = self.well_dict[check_input]
-			# print(already_scanned_tube)
 			already_scanned_tube.markRescanned()
 			self.fig.canvas.draw()
 			

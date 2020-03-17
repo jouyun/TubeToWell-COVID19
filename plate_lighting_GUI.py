@@ -38,8 +38,7 @@ class PLWidget(BoxLayout):
 	def switchWell(self):
 		check_input = self.ids.textbox.text 
 		self.plateLighting.switchWell(check_input)
-		# print(self.plateLighting.ttw.tube_locations[check_input])
-		# self.ids.test_display.text = self.plateLighting.well_dict[check_input]
+		self.ids.test_display.text = self.plateLighting.well_dict[check_input].location
 		self.ids.textbox.text = '' #clear textbox after scan
 	
 if __name__ == '__main__':

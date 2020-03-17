@@ -81,5 +81,5 @@ class TubeToWell:
 			# link barcode to a well location
 			self.tube_locations[location] = check_input
 			# print (location)
-			return True
+			return location
 
