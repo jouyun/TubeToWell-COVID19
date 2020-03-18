@@ -8,10 +8,12 @@ from kivy.garden.matplotlib.backend_kivyagg import FigureCanvasKivyAgg
 from kivy.core.window import Window
 from kivy.uix.label import Label
 from kivy.uix.popup import Popup
+from kivy.uix.button import Button
 
 class WellLitPopup(Popup):
     def __init__(self):
-        super(MyPopup, self).__init__()
+        super(WellLitPopup, self).__init__()
+        self.pos_hint={'y': 425 /  Window.height}
 
     def show(self,error_str):
         content = BoxLayout(orientation='vertical')
@@ -55,6 +57,7 @@ class PLWidget(BoxLayout):
 		self.plateLighting = self.ids.wellPlot.pl
 		self.scanMode = False #enable after name and input have been scanned
 		self.ids.textbox.bind(on_text_validate=self.scanName)
+		self.error_popup = WellLitPopup()
 
 	''' CALLBACKS '''
 
@@ -77,21 +80,27 @@ class PLWidget(BoxLayout):
 	def scanPlate(self, *args):
 		# TODO check if valid plate barcode @ Spyros
 		check_input = self.ids.textbox.text
-		# if self.plateLighting.ttw.isPlate(check_input):
-		self.plate_barcode = check_input
-		self.ids.plate_barcode_label.text += check_input 
-		self.ids.textbox.text = ''
 
-		# openCSV 
-		self.plateLighting.ttw.openCSV(self.user_name, self.plate_barcode)
 
-		# bind textbox to switchwell after barcode is scanned
-		self.ids.textbox.funbind('on_text_validate',self.scanPlate)
-		self.ids.textbox.bind(on_text_validate=self.switchWell)
+		if self.plateLighting.ttw.isPlate(check_input):
+			self.plate_barcode = check_input
+			self.ids.plate_barcode_label.text += check_input 
+			self.ids.textbox.text = ''
 
-		self.ids.notificationLabel.text = 'Please scan tube'
+			# openCSV 
+			self.plateLighting.ttw.openCSV(self.user_name, self.plate_barcode)
 
-		self.scanMode = True
+			# bind textbox to switchwell after barcode is scanned
+			self.ids.textbox.funbind('on_text_validate',self.scanPlate)
+			self.ids.textbox.bind(on_text_validate=self.switchWell)
+
+			self.ids.notificationLabel.text = 'Please scan tube'
+			self.scanMode = True
+
+		else: 
+			self.error_popup.title =  "Barcode Error"
+			self.error_popup.show('Not a valid plate barcode')
+			self.ids.textbox.text = ''
 
 	def switchWell(self, *args):
 		check_input = self.ids.textbox.text 

@@ -29,13 +29,10 @@ class Well:
 		self.target = False
 		self.circle.set_color('gray')
 		
-
 	def markFilled(self):
 		self.target = False
 		self.circle.set_color('red')
 		self.circle.zorder=0
-
-		
 
 	def markTarget(self):
 		self.target = True

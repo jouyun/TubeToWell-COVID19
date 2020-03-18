@@ -45,7 +45,7 @@ class TubeToWell:
 		self.barcode = plate_barcode
 
 	def isPlate(self, check_input):
-		if re.match(r'[RP]{2}[0-9]{6}$', b):
+		if re.match(r'RP[0-9]{8}$', check_input):
 			return True
 		else: 
 			return False
