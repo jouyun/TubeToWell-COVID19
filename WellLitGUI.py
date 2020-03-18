@@ -7,6 +7,21 @@ from plate_lighting import *
 from kivy.garden.matplotlib.backend_kivyagg import FigureCanvasKivyAgg
 from kivy.core.window import Window
 from kivy.uix.label import Label
+from kivy.uix.popup import Popup
+
+class WellLitPopup(Popup):
+    def __init__(self):
+        super(MyPopup, self).__init__()
+
+    def show(self,error_str):
+        content = BoxLayout(orientation='vertical')
+        popup_lb = Label(text=error_str)
+        content.add_widget(popup_lb)
+        close_button = Button(text='Close', size_hint=(1, .4))
+        content.add_widget(close_button)
+        close_button.bind(on_press=self.dismiss)
+        self.content = content
+        self.open()
 
 class MetaLabel(Label):
 	pass
@@ -28,7 +43,7 @@ class WellPlot(BoxLayout):
 		self.pl = PlateLighting(A1_X, A1_Y, CIRC_RADIUIS, WELL_SPACING)
 		self.add_widget(FigureCanvasKivyAgg(figure=self.pl.fig))
 
-class PlateLightingApp(App):
+class WellLitApp(App):
 	def build(self):
 		p = PLWidget()
 		return p
@@ -52,30 +67,31 @@ class PLWidget(BoxLayout):
 		self.ids.user_name_label.text += check_input 
 		self.ids.textbox.text = ''
 
-		# bind textbox to scanBarcode after name is scanned
+		# bind textbox to scanPlate after name is scanned
 		self.ids.textbox.funbind('on_text_validate',self.scanName)
-		self.ids.textbox.bind(on_text_validate=self.scanBarcode)
-		self.ids.notificationLabel.text = 'Please scan your plate'
+		self.ids.textbox.bind(on_text_validate=self.scanPlate)
+		self.ids.notificationLabel.text = 'Please scan plate'
 
-		# self.requestPlate()
 
-		# bind textbox to scanBarcode
-	def scanBarcode(self, *args):
-		print('scanBarcode bound')
+		# bind textbox to scanPlate
+	def scanPlate(self, *args):
 		# TODO check if valid plate barcode @ Spyros
 		check_input = self.ids.textbox.text
+		# if self.plateLighting.ttw.isPlate(check_input):
 		self.plate_barcode = check_input
 		self.ids.plate_barcode_label.text += check_input 
 		self.ids.textbox.text = ''
 
+		# openCSV 
 		self.plateLighting.ttw.openCSV(self.user_name, self.plate_barcode)
 
 		# bind textbox to switchwell after barcode is scanned
-		self.ids.textbox.funbind('on_text_validate',self.scanBarcode)
+		self.ids.textbox.funbind('on_text_validate',self.scanPlate)
 		self.ids.textbox.bind(on_text_validate=self.switchWell)
-		self.ids.notificationLabel.text = 'Please scan your tube'
 
-	# def scanMeta(self, *args):
+		self.ids.notificationLabel.text = 'Please scan tube'
+
+		self.scanMode = True
 
 	def switchWell(self, *args):
 		check_input = self.ids.textbox.text 
@@ -86,4 +102,4 @@ class PLWidget(BoxLayout):
 	
 if __name__ == '__main__':
 	Window.fullscreen = True
-	PlateLightingApp().run()
+	WellLitApp().run()

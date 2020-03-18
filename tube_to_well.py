@@ -4,24 +4,13 @@ import argparse
 import csv
 import time 
 import os
+import re
 
 class TubeToWell:
+	""" A class for mapping scanned tubes to a well location. 
+
+	"""
 	def __init__(self):
-
-		# at startup ask for the user name and well barcode
-		# self.timestr = time.strftime("%Y%m%d-%H%M%S")
-		# self.barcode = 'testbarcode'
-		# self.name = 'testname'
-
-		# TODO: implement parser equivalent on Kivy
-		# self.parser = argparse.ArgumentParser()
-		# self.parser.add_argument('-n', '--name',  help="input user name", required=True)
-		# self.parser.add_argument('-b', '--barcode',  help="barcode number",  required=True)
-		# self.args = self.parser.parse_args()
-		# print("user: " + self.args.name)
-
-		# print("deep well barcode: " + self.barcode) # TODO: this should check if it's a valid plate barcode (can we get a list of barcodes before hand?)
-		# print("date: " + self.timestr) 
 
 		# make a list of the well row characters
 		self.well_rows = [chr(x) for x in range(ord('A'), ord('H') + 1)] # move to state machine
@@ -55,17 +44,22 @@ class TubeToWell:
 			writer.writerows(self.metadata)
 		self.barcode = plate_barcode
 
-	def checkBarcode(self, check_input):
-		print('barcode:' + check_input)
-
-		# the user can only end the protocol by scanning the well plate again, however they cannot end the protocol if there were no tubes scanned
-		# while check_input != self.args.barcode or not self.scanned_tubes:
-			# find a way to make sure inputs came from barcode
-		# check if the barcode was already scanned
-		if check_input == self.barcode:
-			print('this is the plate barcode')
+	def isPlate(self, check_input):
+		if re.match(r'[RP]{2}[0-9]{6}$', b):
+			return True
+		else: 
 			return False
-		elif check_input in self.scanned_tubes:
+
+	def isName(self, check_input):
+		pass
+	def isTube(self, check_input):
+		pass
+
+
+	def checkTubeBarcode(self, check_input):
+
+		# check if the barcode was already scanned
+		if check_input in self.scanned_tubes:
 			print('this tube was already scanned')
 			return False
 			# light up corresponding well

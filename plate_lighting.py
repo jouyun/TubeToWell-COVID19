@@ -16,6 +16,8 @@ CIRC_RADIUIS  = 0.023
 # TODO: Input controls 
 
 class Well:
+	""" A class for individual wells in the matplotlib plot
+	"""
 	def __init__(self, center, radius):
 		self.target = False
 		self.center = center
@@ -47,6 +49,8 @@ class Well:
 				
 
 class PlateLighting:
+	""" A class for lighting up the corresponding well using matplotlib
+	"""
 	def __init__(self, a1_x, a1_y, circ_radius, well_spacing):
 
 		# set up plot 
@@ -57,7 +61,6 @@ class PlateLighting:
 		self.ax.axis('equal')
 		self.fig.subplots_adjust(bottom=0)
 		self.ax.axis('off')
-		# self.fig.canvas.manager.full_screen_toggle() # make sure to set the well lighting display as the main display (go to windows display setting)
 		self.well_dict = {} # links barcode to Well object
 
 		# set up tube to well
@@ -75,7 +78,7 @@ class PlateLighting:
 		self.wells_iterator = iter(self.wells)
 
 	def switchWell(self, check_input):
-		location = self.ttw.checkBarcode(check_input)
+		location = self.ttw.checkTubeBarcode(check_input)
 		if location:
 			target = next(self.wells_iterator)
 			target.markTarget()
