@@ -39,30 +39,43 @@ class PLWidget(BoxLayout):
 		self.ids.textbox.bind(focus=on_focus)
 		self.plateLighting = self.ids.wellPlot.pl
 		self.scanMode = False #enable after name and input have been scanned
-		# self.requestName()
-		# self.requestPlate()
+		self.ids.textbox.bind(on_text_validate=self.scanName)
 
-	def requestPlate(self):
-		self.ids.notificationLabel.text = 'Please scan your plate'
 	''' CALLBACKS '''
 
 	def scanName(self, *args):
+		print('scanName bound')
+
 		# TODO check if valid name tag
 		check_input = self.ids.textbox.text
+		self.user_name = check_input
 		self.ids.user_name_label.text += check_input 
 		self.ids.textbox.text = ''
-		# self.ids.notificationLabel.text = ''
+
+		# bind textbox to scanBarcode after name is scanned
+		self.ids.textbox.funbind('on_text_validate',self.scanName)
 		self.ids.textbox.bind(on_text_validate=self.scanBarcode)
+		self.ids.notificationLabel.text = 'Please scan your plate'
+
 		# self.requestPlate()
 
 		# bind textbox to scanBarcode
 	def scanBarcode(self, *args):
-		# check if valid name tag
-		# bind textbox to switchwell
+		print('scanBarcode bound')
+		# TODO check if valid plate barcode @ Spyros
 		check_input = self.ids.textbox.text
+		self.plate_barcode = check_input
 		self.ids.plate_barcode_label.text += check_input 
 		self.ids.textbox.text = ''
+
+		self.plateLighting.ttw.openCSV(self.user_name, self.plate_barcode)
+
+		# bind textbox to switchwell after barcode is scanned
+		self.ids.textbox.funbind('on_text_validate',self.scanBarcode)
 		self.ids.textbox.bind(on_text_validate=self.switchWell)
+		self.ids.notificationLabel.text = 'Please scan your tube'
+
+	# def scanMeta(self, *args):
 
 	def switchWell(self, *args):
 		check_input = self.ids.textbox.text 

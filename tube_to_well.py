@@ -9,9 +9,9 @@ class TubeToWell:
 	def __init__(self):
 
 		# at startup ask for the user name and well barcode
-		self.timestr = time.strftime("%Y%m%d-%H%M%S")
-		self.barcode = 'testbarcode'
-		self.name = 'testname'
+		# self.timestr = time.strftime("%Y%m%d-%H%M%S")
+		# self.barcode = 'testbarcode'
+		# self.name = 'testname'
 
 		# TODO: implement parser equivalent on Kivy
 		# self.parser = argparse.ArgumentParser()
@@ -20,14 +20,8 @@ class TubeToWell:
 		# self.args = self.parser.parse_args()
 		# print("user: " + self.args.name)
 
-		print("deep well barcode: " + self.barcode) # TODO: this should check if it's a valid plate barcode (can we get a list of barcodes before hand?)
-		print("date: " + self.timestr) 
-		self.metadata = [['date', self.timestr], ['name', self.name], ['deep well barcode', self.barcode]] 
-
-		# set up path to save the well locations csv
-		self.cwd = os.getcwd()
-		self.csv_folder_path = os.path.join(self.cwd, 'well_locations_csv') # TODO: check if folder exists and make it
-		self.csv_file_path = os.path.join(self.csv_folder_path, self.timestr + '-' + self.barcode)
+		# print("deep well barcode: " + self.barcode) # TODO: this should check if it's a valid plate barcode (can we get a list of barcodes before hand?)
+		# print("date: " + self.timestr) 
 
 		# make a list of the well row characters
 		self.well_rows = [chr(x) for x in range(ord('A'), ord('H') + 1)] # move to state machine
@@ -44,12 +38,22 @@ class TubeToWell:
 		for w in self.well_names:
 			self.tube_locations[w] = None
 
+		self.scanned_tubes = []
+
+	def openCSV(self, user_name, plate_barcode): 
+		# set up path to save the well locations csv
+		self.timestr = time.strftime("%Y%m%d-%H%M%S")
+		self.cwd = os.getcwd()
+		self.csv_folder_path = os.path.join(self.cwd, 'well_locations_csv') # TODO: check if folder exists and make it
+		self.csv_file_path = os.path.join(self.csv_folder_path, self.timestr + '_' + plate_barcode)
+
+		self.metadata = [['Timestamp', 'Accession Number', 'Location', 'User Name: ' + user_name, 'Plate Barcode: ' + plate_barcode]]
+
 		# the csv filename will be unique from scan time - TODO: confirm with Rafael how to decide filename
 		with open(self.csv_file_path + '.csv', 'a', newline='') as csvFile:
 			writer = csv.writer(csvFile)
 			writer.writerows(self.metadata)
-
-		self.scanned_tubes = []
+		self.barcode = plate_barcode
 
 	def checkBarcode(self, check_input):
 		print('barcode:' + check_input)
