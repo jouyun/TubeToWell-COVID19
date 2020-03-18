@@ -60,21 +60,27 @@ class PLWidget(BoxLayout):
 		self.error_popup = WellLitPopup()
 
 	''' CALLBACKS '''
+	def showBarcodeError(self, barcode_type):
+		self.error_popup.title =  "Barcode Error"
+		self.error_popup.show('Not a valid ' + barcode_type +' barcode')
+		self.ids.textbox.text = ''
 
 	def scanName(self, *args):
 		print('scanName bound')
 
 		# TODO check if valid name tag
 		check_input = self.ids.textbox.text
-		self.user_name = check_input
-		self.ids.user_name_label.text += check_input 
-		self.ids.textbox.text = ''
+		if self.plateLighting.ttw.isName(check_input):
+			self.user_name = check_input
+			self.ids.user_name_label.text += check_input 
+			self.ids.textbox.text = ''
 
-		# bind textbox to scanPlate after name is scanned
-		self.ids.textbox.funbind('on_text_validate',self.scanName)
-		self.ids.textbox.bind(on_text_validate=self.scanPlate)
-		self.ids.notificationLabel.text = 'Please scan plate'
-
+			# bind textbox to scanPlate after name is scanned
+			self.ids.textbox.funbind('on_text_validate',self.scanName)
+			self.ids.textbox.bind(on_text_validate=self.scanPlate)
+			self.ids.notificationLabel.text = 'Please scan plate'
+		else: 
+			self.showBarcodeError('name')
 
 		# bind textbox to scanPlate
 	def scanPlate(self, *args):
@@ -98,17 +104,19 @@ class PLWidget(BoxLayout):
 			self.scanMode = True
 
 		else: 
-			self.error_popup.title =  "Barcode Error"
-			self.error_popup.show('Not a valid plate barcode')
-			self.ids.textbox.text = ''
+			self.showBarcodeError('plate')
 
 	def switchWell(self, *args):
 		check_input = self.ids.textbox.text 
-		self.plateLighting.switchWell(check_input)
-		self.ids.notificationLabel.text = self.plateLighting.well_dict[check_input].location
-		print(self.plateLighting.well_dict[check_input].location)
-		self.ids.textbox.text = '' #clear textbox after scan
-	
+
+		if self.plateLighting.ttw.isTube(check_input):
+			self.plateLighting.switchWell(check_input)
+			self.ids.notificationLabel.text = self.plateLighting.well_dict[check_input].location
+			print(self.plateLighting.well_dict[check_input].location)
+			self.ids.textbox.text = '' #clear textbox after scan
+		else: 
+			self.showBarcodeError('tube')
+			
 if __name__ == '__main__':
 	Window.fullscreen = True
 	WellLitApp().run()

@@ -47,13 +47,17 @@ class TubeToWell:
 	def isPlate(self, check_input):
 		if re.match(r'RP[0-9]{8}$', check_input):
 			return True
-		else: 
-			return False
+		return False
 
 	def isName(self, check_input):
-		pass
+		if any(char.isdigit() for char in check_input):
+			return False
+		return True
+
 	def isTube(self, check_input):
-		pass
+		if re.match(r'[A-Z][0-9]{4}$', check_input):
+			return True
+		return False
 
 
 	def checkTubeBarcode(self, check_input):
