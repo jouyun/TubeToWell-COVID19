@@ -31,6 +31,8 @@ class Well:
 	def markFilled(self):
 		self.target = False
 		self.circle.set_color('red')
+		self.circle.zorder=0
+
 		
 
 	def markTarget(self):
@@ -41,7 +43,7 @@ class Well:
 	def markRescanned(self):
 		self.target = False
 		self.circle.set_color('blue')
-		self.circle.zorder=2
+		self.circle.zorder=1
 				
 
 class PlateLighting:
@@ -72,9 +74,6 @@ class PlateLighting:
 				self.ax.add_artist(well.circle)
 		self.wells_iterator = iter(self.wells)
 
-		# self.check_input = ''
-		# self.fig.canvas.mpl_connect('key_press_event', self.on_trigger)
-
 	def switchWell(self, check_input):
 		location = self.ttw.checkBarcode(check_input)
 		if location:
@@ -86,7 +85,8 @@ class PlateLighting:
 
 			# the well will be marked as filled when the next target is marked 
 			target.markFilled()
-			
+
+			# link target well object to a barcode in the well_dict dictonary
 			self.well_dict[target.barcode] = target
 
 

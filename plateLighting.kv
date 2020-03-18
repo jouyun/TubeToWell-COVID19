@@ -2,6 +2,10 @@
 #:import FigureCanvasKivyAgg kivy.garden.matplotlib.backend_kivyagg
 #:import plt matplotlib.pyplot
 
+<MetaLabel>:
+	text_size: self.size
+	halign: 'left'
+	padding_x: 5
 
 <PLWidget>:
 	orientation: 'vertical'
@@ -9,9 +13,23 @@
 		orientation: 'horizontal'
 		size_hint_y: None
 		height: 180
+		BoxLayout:
+			size_hint_x: .3
+			id: metadata_box
+			orientation: 'vertical'
+			MetaLabel:
+				id: user_name_label
+				text: 'User Name: \n'
+			MetaLabel:
+				id: plate_barcode_label
+				text: 'Plate Barcode: \n'
+			Label:
+				size_hint_y: 2
 	    Label:
-	    	id: test_display
-	        text: 'Instructions'
+	    	id: notificationLabel
+	        text: 'Please scan your name tag'
+	        font_size: 20
+	        bold: True
     	BoxLayout:
     		size_hint_x: None
     		width: 180
@@ -19,11 +37,13 @@
 		    TextInput:
 		    	id: textbox
 		    	multiline: False
-		    	on_text_validate: root.switchWell()
+		    	on_text_validate: root.scanName()
 		    	focus: True
 		    Button:
-		    	text: 'undo'
+		    	text: 'undo last tube'
 		    Button:
 		    	text: 'new plate'
 	WellPlot:
 		id: wellPlot
+
+		
