@@ -2,6 +2,11 @@
 #:import FigureCanvasKivyAgg kivy.garden.matplotlib.backend_kivyagg
 #:import plt matplotlib.pyplot
 
+<ConfirmPopup>:
+	size_hint: None,None
+	height: 200
+	width: 500
+
 <WellLitPopup>:
 	size_hint: None,None
 	height: 200
@@ -11,6 +16,7 @@
 	text_size: self.size
 	halign: 'left'
 	padding_x: 5
+	markup: True
 
 <PLWidget>:
 	orientation: 'vertical'
@@ -24,10 +30,12 @@
 			orientation: 'vertical'
 			MetaLabel:
 				id: user_name_label
-				text: 'User Name: \n'
+				text: '[b]User Name:[/b] \n'
 			MetaLabel:
 				id: plate_barcode_label
-				text: 'Plate Barcode: \n'
+				text: '[b]Plate Barcode:[/b] \n'
+			MetaLabel:
+				id: tube_barcode_label
 			Label:
 				size_hint_y: 2
 	    Label:
@@ -51,9 +59,6 @@
 		    Button:
 		    	text: 'Finish Plate'
 		    	on_press: root.finishPlate()
-		    Button:
-		    	text: 'Abort Plate'
-		    	on_press: root.abortPlate()
 	WellPlot:
 		id: wellPlot
 

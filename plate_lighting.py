@@ -62,7 +62,6 @@ class PlateLighting:
 				well = Well((x_coord,y_coord), circ_radius)
 				self.wells.append(well)
 				self.ax.add_artist(well.circle)
-		# self.wells_iterator = iter(self.wells)
 		self.well_idx = 0
 
 
@@ -83,7 +82,6 @@ class PlateLighting:
 			self.well_dict[self.target.barcode] = self.target
 
 			return True # return true if new tube
-
 
 		elif check_input in self.ttw.scanned_tubes:
 			already_scanned_tube = self.well_dict[check_input]

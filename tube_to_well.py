@@ -77,6 +77,7 @@ class TubeToWell:
 				row = [[scan_time, check_input, location]]
 				writer = csv.writer(csvFile)
 				writer.writerows(row)
+				csvFile.close()
 
 			# add to barcode to scanned_tubes list
 			self.scanned_tubes.append(check_input)

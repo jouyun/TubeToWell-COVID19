@@ -9,6 +9,33 @@ from kivy.core.window import Window
 from kivy.uix.label import Label
 from kivy.uix.popup import Popup
 from kivy.uix.button import Button
+import time
+
+class ConfirmPopup(Popup):
+	def __init__(self):
+		super(ConfirmPopup, self).__init__()
+		self.pos_hint={'y': 400 /  Window.height}
+
+	def show(self):
+		content = BoxLayout(orientation='vertical')
+		popup_lb = Label(text='Finish plate?')
+		title = 'Confirm exit'
+		content.add_widget(popup_lb)
+		button_box = BoxLayout(orientation='horizontal', size_hint=(1, .4))
+		content.add_widget(button_box)
+		yes_button = Button(text='yes')
+		button_box.add_widget(yes_button)
+		yes_button.bind(on_press=self.yes_callback)
+
+		no_button = Button(text='no')
+		button_box.add_widget(no_button)
+		no_button.bind(on_press=self.dismiss)
+
+
+		self.content = content
+		self.open()
+	def yes_callback(self, *args):
+		WellLitApp.get_running_app().stop()
 
 class WellLitPopup(Popup):
 	def __init__(self):
@@ -58,11 +85,15 @@ class PLWidget(BoxLayout):
 		self.scanMode = False #enable after name and input have been scanned
 		self.ids.textbox.bind(on_text_validate=self.scanName)
 		self.error_popup = WellLitPopup()
+		self.confirm_popup = ConfirmPopup()
+		self.canUndo = False
+		self.warningsMade = False
 		# self.ids.button_box.
 
 	''' CALLBACKS '''
 	def makeWarningFile(self):
 		# set up path to save warnings
+		self.warningsMade = True
 		self.warning_folder_path = os.path.join(self.plateLighting.ttw.cwd, 'well_locations_csv') # TODO: check if folder exists and make it
 		self.warning_file_path = os.path.join(self.warning_folder_path, self.plateLighting.ttw.plate_timestr + '_' + self.plateLighting.ttw.plate_barcode +'_WARNING')
 		self.warning_metadata = self.plateLighting.ttw.metadata
@@ -70,16 +101,19 @@ class PLWidget(BoxLayout):
 		with open(self.warning_file_path + '.csv', 'w', newline='') as csvFile:
 			writer = csv.writer(csvFile)
 			writer.writerows(self.warning_metadata)
+			csvFile.close()
 
-	def undoTube(self, barcode=None):
+	def undoTube(self):
 		# will not enable undo button if there is nothing in scanned tubes or the user has not scanned the plate and barcode
 		if not self.canUndo:
 			self.error_popup.title =  "Invalid Action"
 			self.error_popup.show('Cannot undo')
-			self.ids.textbox.text = ''
+			# self.ids.textbox.text = ''
 
 		elif self.scanMode and self.plateLighting.ttw.scanned_tubes:
-			self.makeWarningFile()
+			if not self.warningsMade:
+				print('here')
+				self.makeWarningFile()
 			# remove last row from CSV file
 			original_rows = []
 			with open(self.plateLighting.ttw.csv_file_path+'.csv', 'r') as csvFile:
@@ -90,14 +124,27 @@ class PLWidget(BoxLayout):
 			with open(self.plateLighting.ttw.csv_file_path + '.csv', 'w', newline='') as csvFile:
 				writer = csv.writer(csvFile)
 				writer.writerows(original_rows_edited)
+				csvFile.close()
 
 			self.plateLighting.ttw.scanned_tubes = self.plateLighting.ttw.scanned_tubes[:-1]
-			self.plateLighting.ttw.tube_locations[barcode] = ''
+			undone_barcode = self.plateLighting.target.barcode
+			undone_location = self.plateLighting.ttw.tube_locations[undone_barcode]
+			self.plateLighting.ttw.tube_locations[undone_barcode] = ''
 			self.plateLighting.well_idx -= 1
 			self.plateLighting.ttw.current_idx -=1
-			self.plateLighting.target.markEmpty()
-			self.plateLighting.fig.canvas.draw()
+			self.canUndo = False 
 
+			# write to warning file
+			warn_timestr = time.strftime("%Y%m%d-%H%M%S")
+			warning_row = [[warn_timestr, undone_barcode, undone_location, 'unscanned']]
+			with open(self.warning_file_path + '.csv', 'a', newline='') as csvFile:
+				writer = csv.writer(csvFile)
+				writer.writerows(warning_row)
+				csvFile.close()
+
+			self.error_popup.title =  "Notification"
+			self.ids.tube_barcode_label.text = 'Tube Barcode: \n' 
+			self.error_popup.show('Tube Unscanned')
 
 		else:
 			self.error_popup.title =  "Invalid Action"
@@ -105,9 +152,8 @@ class PLWidget(BoxLayout):
 			self.ids.textbox.text = ''
 
 	def finishPlate(self):
-		pass
-	def abortPlate(self):
-		pass
+		self.confirm_popup.show()
+
 	def showBarcodeError(self, barcode_type):
 		self.error_popup.title =  "Barcode Error"
 		self.error_popup.show('Not a valid ' + barcode_type +' barcode')
@@ -154,6 +200,7 @@ class PLWidget(BoxLayout):
 
 		# switch well if it is a new tube
 		if self.plateLighting.ttw.isTube(check_input):
+			self.ids.tube_barcode_label.text = '[b]Tube Barcode:[/b] \n' + check_input
 			self.canUndo = self.plateLighting.switchWell(check_input) # can only undo if it's a new target
 			self.ids.notificationLabel.text = self.plateLighting.well_dict[check_input].location
 			print(self.plateLighting.well_dict[check_input].location)
