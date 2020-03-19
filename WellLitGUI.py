@@ -12,9 +12,10 @@ from kivy.uix.button import Button
 import time
 
 class ConfirmPopup(Popup):
-	def __init__(self):
+	def __init__(self, txt_file_path=None):
 		super(ConfirmPopup, self).__init__()
 		self.pos_hint={'y': 800 /  Window.height}
+		self.txt_file_path = txt_file_path
 
 	def show(self):
 		content = BoxLayout(orientation='vertical')
@@ -35,6 +36,9 @@ class ConfirmPopup(Popup):
 		self.content = content
 		self.open()
 	def yes_callback(self, *args):
+		if self.txt_file_path:
+			txt_file = open(self.txt_file_path,"w") 
+			txt_file.close() 
 		WellLitApp.get_running_app().stop()
 
 class WellLitPopup(Popup):
@@ -85,17 +89,17 @@ class PLWidget(BoxLayout):
 		self.scanMode = False #enable after name and input have been scanned
 		self.ids.textbox.bind(on_text_validate=self.scanName)
 		self.error_popup = WellLitPopup()
-		self.confirm_popup = ConfirmPopup()
 		self.canUndo = False
 		self.warningsMade = False
-		# self.ids.button_box.
+		self.confirm_popup = ConfirmPopup()
+		
 
 	''' CALLBACKS '''
 	def makeWarningFile(self):
 		# set up path to save warnings
 		self.warningsMade = True
-		self.warning_folder_path = os.path.join(self.plateLighting.ttw.cwd, 'well_locations_csv') # TODO: check if folder exists and make it
-		self.warning_file_path = os.path.join(self.warning_folder_path, self.plateLighting.ttw.plate_timestr + '_' + self.plateLighting.ttw.plate_barcode +'_WARNING')
+		 # TODO: check if folder exists and make it
+		self.warning_file_path = os.path.join(self.plateLighting.ttw.csv_file_path +'_WARNING')
 		self.warning_metadata = self.plateLighting.ttw.metadata
 
 		with open(self.warning_file_path + '.csv', 'w', newline='') as csvFile:
@@ -184,6 +188,10 @@ class PLWidget(BoxLayout):
 
 			# openCSV 
 			self.plateLighting.ttw.openCSV(self.user_name, self.plate_barcode)
+
+			# set up text file confirmation
+			self.txt_file_path = os.path.join(self.plateLighting.ttw.csv_file_path +'_FINISHED.txt')
+			self.confirm_popup = ConfirmPopup(self.txt_file_path)
 
 			# bind textbox to switchwell after barcode is scanned
 			self.ids.textbox.funbind('on_text_validate',self.scanPlate)

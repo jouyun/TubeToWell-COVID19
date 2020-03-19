@@ -36,7 +36,8 @@ class TubeToWell:
 		self.plate_timestr = time.strftime("%Y%m%d-%H%M%S")
 		self.cwd = os.getcwd()
 		self.csv_folder_path = os.path.join(self.cwd, 'well_locations_csv') # TODO: check if folder exists and make it
-		self.csv_file_path = os.path.join(self.csv_folder_path, self.plate_timestr + '_' + plate_barcode)
+		self.csv_file_path = os.path.join(self.csv_folder_path, self.plate_timestr + '_' + plate_barcode + '_tube_to_plate')
+		self.csv_file_header = self.plate_timestr + '_' + plate_barcode + '_tube_to_plate'
 		self.metadata = [['%Plate Timestamp: ', self.plate_timestr], ['%Plate Barcode: ', plate_barcode], ['%User Name: ', user_name], ['%Timestamp', 'Tube Barcode', 'Location']]
 
 		with open(self.csv_file_path + '.csv', 'w', newline='') as csvFile:
@@ -45,7 +46,7 @@ class TubeToWell:
 		self.plate_barcode = plate_barcode
 
 	def isPlate(self, check_input):
-		if re.match(r'RP[0-9]{8}$', check_input):
+		if re.match(r'SP[0-9]{6}$', check_input):
 			return True
 		return False
 
@@ -57,13 +58,15 @@ class TubeToWell:
 	def isTube(self, check_input):
 		if re.match(r'[A-Z][0-9]{4}', check_input):
 			return True
+		elif check_input == 'CONTROL':
+			return True
 		return False
 
 
 	def checkTubeBarcode(self, check_input):
 
 		# check if the barcode was already scanned
-		if check_input in self.scanned_tubes:
+		if check_input in self.scanned_tubes and check_input != 'CONTROL':
 			print('this tube was already scanned')
 			return False
 			# light up corresponding well
