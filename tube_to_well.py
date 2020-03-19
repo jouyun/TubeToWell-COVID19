@@ -21,6 +21,7 @@ class TubeToWell:
 			for letter in self.well_rows:
 				self.well_names.append(letter+str(i))
 		self.well_names_iterator = iter(self.well_names)
+		self.current_idx = 0
 
 		# make a dictionary with the tube locations as the key and the barcodes as the value
 		self.tube_locations = {}
@@ -31,18 +32,17 @@ class TubeToWell:
 
 	def openCSV(self, user_name, plate_barcode): 
 		# set up path to save the well locations csv
-		self.timestr = time.strftime("%Y%m%d-%H%M%S")
+		self.user_name = user_name
+		self.plate_timestr = time.strftime("%Y%m%d-%H%M%S")
 		self.cwd = os.getcwd()
 		self.csv_folder_path = os.path.join(self.cwd, 'well_locations_csv') # TODO: check if folder exists and make it
-		self.csv_file_path = os.path.join(self.csv_folder_path, self.timestr + '_' + plate_barcode)
+		self.csv_file_path = os.path.join(self.csv_folder_path, self.plate_timestr + '_' + plate_barcode)
+		self.metadata = [['%Plate Timestamp: ', self.plate_timestr], ['%Plate Barcode: ', plate_barcode], ['%User Name: ', user_name], ['%Timestamp', 'Tube Barcode', 'Location']]
 
-		self.metadata = [['Timestamp', 'Accession Number', 'Location', 'User Name: ' + user_name, 'Plate Barcode: ' + plate_barcode]]
-
-		# the csv filename will be unique from scan time - TODO: confirm with Rafael how to decide filename
-		with open(self.csv_file_path + '.csv', 'a', newline='') as csvFile:
+		with open(self.csv_file_path + '.csv', 'w', newline='') as csvFile:
 			writer = csv.writer(csvFile)
 			writer.writerows(self.metadata)
-		self.barcode = plate_barcode
+		self.plate_barcode = plate_barcode
 
 	def isPlate(self, check_input):
 		if re.match(r'RP[0-9]{8}$', check_input):
@@ -55,7 +55,7 @@ class TubeToWell:
 		return True
 
 	def isTube(self, check_input):
-		if re.match(r'[A-Z][0-9]{4}$', check_input):
+		if re.match(r'[A-Z][0-9]{4}', check_input):
 			return True
 		return False
 
@@ -72,7 +72,8 @@ class TubeToWell:
 			with open(self.csv_file_path +'.csv', 'a', newline='') as csvFile:
 				# log scan time
 				scan_time = time.strftime("%Y%m%d-%H%M%S")
-				location = next(self.well_names_iterator)
+				location = self.well_names[self.current_idx]
+				self.current_idx += 1
 				row = [[scan_time, check_input, location]]
 				writer = csv.writer(csvFile)
 				writer.writerows(row)
@@ -81,7 +82,7 @@ class TubeToWell:
 			self.scanned_tubes.append(check_input)
 
 			# link barcode to a well location
-			self.tube_locations[location] = check_input
+			self.tube_locations[check_input] = location
 			# print (location)
 			return location
 

@@ -4,7 +4,7 @@
 
 <WellLitPopup>:
 	size_hint: None,None
-	height: 180
+	height: 200
 	width: 500
 
 <MetaLabel>:
@@ -17,7 +17,7 @@
 	BoxLayout:
 		orientation: 'horizontal'
 		size_hint_y: None
-		height: 180
+		height: 200
 		BoxLayout:
 			size_hint_x: .3
 			id: metadata_box
@@ -39,16 +39,21 @@
     		size_hint_x: None
     		width: 180
 		    orientation: 'vertical'
+		    id: button_box
 		    TextInput:
 		    	id: textbox
 		    	multiline: False
+		    	size_hint_y: .5
 		    	focus: True
 		    Button:
-		    	text: 'undo last tube'
+		    	text: 'Undo Last Tube'
+		    	on_press: root.undoTube()
 		    Button:
-		    	text: 'new plate'
+		    	text: 'Finish Plate'
+		    	on_press: root.finishPlate()
 		    Button:
-		    	text: 'abort'
+		    	text: 'Abort Plate'
+		    	on_press: root.abortPlate()
 	WellPlot:
 		id: wellPlot
 
