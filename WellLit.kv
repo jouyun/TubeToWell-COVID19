@@ -4,28 +4,34 @@
 
 <ConfirmPopup>:
 	size_hint: None,None
-	height: 200
+	height: 400
 	width: 500
+	title: 'Confirm exit'
 
 <WellLitPopup>:
 	size_hint: None,None
-	height: 200
-	width: 500
+	height: 400
+	width: 800
 
 <MetaLabel>:
 	text_size: self.size
 	halign: 'left'
 	padding_x: 5
 	markup: True
+	font_size: 30
+<Button>
+	font_size: 30
+
 
 <PLWidget>:
 	orientation: 'vertical'
 	BoxLayout:
 		orientation: 'horizontal'
 		size_hint_y: None
-		height: 200
+		height: 400
 		BoxLayout:
-			size_hint_x: .3
+			size_hint_x: None
+    		width: 300
 			id: metadata_box
 			orientation: 'vertical'
 			MetaLabel:
@@ -41,11 +47,11 @@
 	    Label:
 	    	id: notificationLabel
 	        text: 'Please scan your name tag'
-	        font_size: 20
+	        font_size: 50
 	        bold: True
     	BoxLayout:
     		size_hint_x: None
-    		width: 180
+    		width: 300
 		    orientation: 'vertical'
 		    id: button_box
 		    TextInput:

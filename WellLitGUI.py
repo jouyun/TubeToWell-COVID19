@@ -14,12 +14,12 @@ import time
 class ConfirmPopup(Popup):
 	def __init__(self):
 		super(ConfirmPopup, self).__init__()
-		self.pos_hint={'y': 400 /  Window.height}
+		self.pos_hint={'y': 800 /  Window.height}
 
 	def show(self):
 		content = BoxLayout(orientation='vertical')
-		popup_lb = Label(text='Finish plate?')
-		title = 'Confirm exit'
+		popup_lb = Label(text='Finish plate?', font_size = 30)
+		# title = 'Confirm exit'
 		content.add_widget(popup_lb)
 		button_box = BoxLayout(orientation='horizontal', size_hint=(1, .4))
 		content.add_widget(button_box)
@@ -40,11 +40,11 @@ class ConfirmPopup(Popup):
 class WellLitPopup(Popup):
 	def __init__(self):
 		super(WellLitPopup, self).__init__()
-		self.pos_hint={'y': 400 /  Window.height}
+		self.pos_hint={'y': 800 /  Window.height}
 
 	def show(self,error_str):
 		content = BoxLayout(orientation='vertical')
-		popup_lb = Label(text=error_str)
+		popup_lb = Label(text=error_str, font_size = 30)
 		content.add_widget(popup_lb)
 		close_button = Button(text='Close', size_hint=(1, .4))
 		content.add_widget(close_button)
@@ -65,10 +65,10 @@ def on_focus(instance, value):
 class WellPlot(BoxLayout):
 	def __init__(self, **kwargs):
 		super(WellPlot, self).__init__(**kwargs)
-		A1_X = 0.23
-		A1_Y = 0.595
+		A1_X = 0.235
+		A1_Y = 0.59
 		WELL_SPACING = 0.045
-		CIRC_RADIUIS  = 0.023
+		CIRC_RADIUIS  = 0.024
 		self.pl = PlateLighting(A1_X, A1_Y, CIRC_RADIUIS, WELL_SPACING)
 		self.add_widget(FigureCanvasKivyAgg(figure=self.pl.fig))
 
@@ -202,6 +202,7 @@ class PLWidget(BoxLayout):
 		if self.plateLighting.ttw.isTube(check_input):
 			self.ids.tube_barcode_label.text = '[b]Tube Barcode:[/b] \n' + check_input
 			self.canUndo = self.plateLighting.switchWell(check_input) # can only undo if it's a new target
+			self.ids.notificationLabel.font_size = 100
 			self.ids.notificationLabel.text = self.plateLighting.well_dict[check_input].location
 			print(self.plateLighting.well_dict[check_input].location)
 			self.ids.textbox.text = '' #clear textbox after scan
@@ -209,5 +210,6 @@ class PLWidget(BoxLayout):
 			self.showBarcodeError('tube')
 		
 if __name__ == '__main__':
+	Window.size =(1600,1200)
 	Window.fullscreen = True
 	WellLitApp().run()
