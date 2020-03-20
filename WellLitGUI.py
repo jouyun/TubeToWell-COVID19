@@ -130,6 +130,9 @@ class PLWidget(BoxLayout):
 				writer.writerows(original_rows_edited)
 				csvFile.close()
 
+			self.plateLighting.target.markEmpty()
+			self.plateLighting.fig.canvas.draw()
+
 			self.plateLighting.ttw.scanned_tubes = self.plateLighting.ttw.scanned_tubes[:-1]
 			undone_barcode = self.plateLighting.target.barcode
 			undone_location = self.plateLighting.ttw.tube_locations[undone_barcode]
@@ -137,6 +140,8 @@ class PLWidget(BoxLayout):
 			self.plateLighting.well_idx -= 1
 			self.plateLighting.ttw.current_idx -=1
 			self.canUndo = False 
+
+
 
 			# write to warning file
 			warn_timestr = time.strftime("%Y%m%d-%H%M%S")
@@ -219,5 +224,5 @@ class PLWidget(BoxLayout):
 		
 if __name__ == '__main__':
 	Window.size =(1600,1200)
-	Window.fullscreen = True
+	# Window.fullscreen = True
 	WellLitApp().run()
