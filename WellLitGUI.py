@@ -1,3 +1,6 @@
+# Joana Cabrera
+# 3/15/2020
+
 import kivy
 kivy.require('1.11.1')
 from kivy.app import App
@@ -87,7 +90,7 @@ class PLWidget(BoxLayout):
 		self.ids.textbox.bind(focus=on_focus)
 		self.plateLighting = self.ids.wellPlot.pl
 		self.scanMode = False #enable after name and input have been scanned
-		self.ids.textbox.bind(on_text_validate=self.scanName)
+		self.ids.textbox.bind(on_text_validate=self.scanRecorder)
 		self.error_popup = WellLitPopup()
 		self.canUndo = False
 		self.warningsMade = False
@@ -116,7 +119,6 @@ class PLWidget(BoxLayout):
 
 		elif self.scanMode and self.plateLighting.ttw.scanned_tubes:
 			if not self.warningsMade:
-				print('here')
 				self.makeWarningFile()
 			# remove last row from CSV file
 			original_rows = []
@@ -152,7 +154,7 @@ class PLWidget(BoxLayout):
 				csvFile.close()
 
 			self.error_popup.title =  "Notification"
-			self.ids.tube_barcode_label.text = 'Tube Barcode: \n' 
+			self.ids.tube_barcode_label.text = '' 
 			self.error_popup.show('Tube Unscanned')
 
 		else:
@@ -168,15 +170,29 @@ class PLWidget(BoxLayout):
 		self.error_popup.show('Not a valid ' + barcode_type +' barcode')
 		self.ids.textbox.text = ''
 
-	def scanName(self, *args):
+	def scanRecorder(self, *args):
 		check_input = self.ids.textbox.text
 		if self.plateLighting.ttw.isName(check_input):
-			self.user_name = check_input
-			self.ids.user_name_label.text += check_input 
+			self.recorder = check_input
+			self.ids.recorder_label.text += check_input 
 			self.ids.textbox.text = ''
 
 			# bind textbox to scanPlate after name is scanned
-			self.ids.textbox.funbind('on_text_validate',self.scanName)
+			self.ids.textbox.funbind('on_text_validate',self.scanRecorder)
+			self.ids.textbox.bind(on_text_validate=self.scanAliquoter)
+			self.ids.notificationLabel.text = "Please scan the aliquoter's barcode"
+		else: 
+			self.showBarcodeError('name')
+
+	def scanAliquoter(self, *args):
+		check_input = self.ids.textbox.text
+		if self.plateLighting.ttw.isName(check_input):
+			self.aliquoter = check_input
+			self.ids.aliquoter_label.text += check_input 
+			self.ids.textbox.text = ''
+
+			# bind textbox to scanPlate after name is scanned
+			self.ids.textbox.funbind('on_text_validate',self.scanAliquoter)
 			self.ids.textbox.bind(on_text_validate=self.scanPlate)
 			self.ids.notificationLabel.text = 'Please scan plate'
 		else: 
@@ -184,7 +200,6 @@ class PLWidget(BoxLayout):
 
 		# bind textbox to scanPlate
 	def scanPlate(self, *args):
-		# TODO check if valid plate barcode @ Spyros
 		check_input = self.ids.textbox.text
 		if self.plateLighting.ttw.isPlate(check_input):
 			self.plate_barcode = check_input
@@ -192,7 +207,7 @@ class PLWidget(BoxLayout):
 			self.ids.textbox.text = ''
 
 			# openCSV 
-			self.plateLighting.ttw.openCSV(self.user_name, self.plate_barcode)
+			self.plateLighting.ttw.openCSV(recorder=self.recorder, aliquoter=self.aliquoter, plate_barcode=self.plate_barcode)
 
 			# set up text file confirmation
 			self.txt_file_path = os.path.join(self.plateLighting.ttw.csv_file_path +'_FINISHED.txt')
@@ -213,7 +228,7 @@ class PLWidget(BoxLayout):
 
 		# switch well if it is a new tube
 		if self.plateLighting.ttw.isTube(check_input):
-			self.ids.tube_barcode_label.text = '[b]Tube Barcode:[/b] \n' + check_input
+			self.ids.tube_barcode_label.text = check_input
 			self.canUndo = self.plateLighting.switchWell(check_input) # can only undo if it's a new target
 			self.ids.notificationLabel.font_size = 100
 			self.ids.notificationLabel.text = self.plateLighting.well_dict[check_input].location

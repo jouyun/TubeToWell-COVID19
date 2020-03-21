@@ -18,7 +18,7 @@
 	halign: 'left'
 	padding_x: 5
 	markup: True
-	font_size: 30
+	font_size: 20
 <Button>
 	font_size: 30
 
@@ -35,18 +35,25 @@
 			id: metadata_box
 			orientation: 'vertical'
 			MetaLabel:
-				id: user_name_label
-				text: '[b]User Name:[/b] \n'
+				id: recorder_label
+				text: '[b]Recorder:[/b] \n'
+			MetaLabel:
+				id: aliquoter_label
+				text: '[b]Aliquoter:[/b] \n'
 			MetaLabel:
 				id: plate_barcode_label
 				text: '[b]Plate Barcode:[/b] \n'
+			MetaLabel: 
+				text: '[b]Tube Barcode:[/b]'
 			MetaLabel:
 				id: tube_barcode_label
+				font_size: 50
 			Label:
-				size_hint_y: 2
+				size_hint_y: 1.5
+
 	    Label:
 	    	id: notificationLabel
-	        text: 'Please scan your name tag'
+	        text: "Please scan the recorder's barcode"
 	        font_size: 50
 	        bold: True
     	BoxLayout:

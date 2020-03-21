@@ -1,4 +1,7 @@
 #!/usr/bin/env python3
+
+# Joana Cabrera
+# 3/15/2020 
 import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.patches import Circle

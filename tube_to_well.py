@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# Joana Cabrera
+# 3/15/2020
 
 import argparse
 import csv
@@ -30,15 +32,18 @@ class TubeToWell:
 
 		self.scanned_tubes = []
 
-	def openCSV(self, user_name, plate_barcode): 
+	def openCSV(self, recorder, aliquoter, plate_barcode): 
 		# set up path to save the well locations csv
-		self.user_name = user_name
+		self.aliquoter = aliquoter
+		self.recorder = recorder
 		self.plate_timestr = time.strftime("%Y%m%d-%H%M%S")
 		self.cwd = os.getcwd()
-		self.csv_folder_path = os.path.join(self.cwd, 'well_locations_csv') # TODO: check if folder exists and make it
+		self.csv_folder_path = os.path.join(self.cwd, 'well_locations_csv')
+		if not os.path.exists(self.csv_folder_path):
+			os.makedirs(self.csv_folder_path)
 		self.csv_file_path = os.path.join(self.csv_folder_path, self.plate_timestr + '_' + plate_barcode + '_tube_to_plate')
 		self.csv_file_header = self.plate_timestr + '_' + plate_barcode + '_tube_to_plate'
-		self.metadata = [['%Plate Timestamp: ', self.plate_timestr], ['%Plate Barcode: ', plate_barcode], ['%User Name: ', user_name], ['%Timestamp', 'Tube Barcode', 'Location']]
+		self.metadata = [['%Plate Timestamp: ', self.plate_timestr], ['%Plate Barcode: ', plate_barcode], ['%Recorder Name: ', recorder], ['%Aliquoter Name: ', aliquoter], ['%Timestamp', 'Tube Barcode', 'Location']]
 
 		with open(self.csv_file_path + '.csv', 'w', newline='') as csvFile:
 			writer = csv.writer(csvFile)
@@ -46,13 +51,15 @@ class TubeToWell:
 		self.plate_barcode = plate_barcode
 
 	def isPlate(self, check_input):
-		if re.match(r'SP[0-9]{6}$', check_input):
+		if re.match(r'SP[0-9]{6}$', check_input) or check_input == 'MANUAL EDIT':
 			return True
 		return False
 
 	def isName(self, check_input):
 		if any(char.isdigit() for char in check_input):
 			return False
+		elif check_input == 'MANUAL EDIT':
+			return True
 		return True
 
 	def isTube(self, check_input):
@@ -65,7 +72,7 @@ class TubeToWell:
 	def checkTubeBarcode(self, check_input):
 
 		# check if the barcode was already scanned
-		if check_input in self.scanned_tubes and check_input != 'CONTROL':
+		if check_input in self.scanned_tubes and check_input != 'CONTROL' and check_input != 'MANUAL EDIT':
 			print('this tube was already scanned')
 			return False
 			# light up corresponding well
