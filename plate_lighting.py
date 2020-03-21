@@ -11,7 +11,10 @@ from tube_to_well import *
 
 # TODO: put this into a state machine later
 # if layout changes, use lighting location to find A1 and spacing
-
+A1_X = 0.235
+A1_Y = 0.59
+WELL_SPACING = 0.045
+CIRC_RADIUIS  = 0.024
 class Well:
 	""" A class for individual wells in the matplotlib plot
 	"""
@@ -65,6 +68,8 @@ class PlateLighting:
 				well = Well((x_coord,y_coord), circ_radius)
 				self.wells.append(well)
 				self.ax.add_artist(well.circle)
+		
+		# keep track of target index
 		self.well_idx = 0
 
 
@@ -97,6 +102,19 @@ class PlateLighting:
 
 	def show(self):
 		plt.show()
+
+	def reset(self):
+		# mark all wells as empty
+		for w in self.wells:
+			w.markEmpty()
+		self.fig.canvas.draw()
+
+		# clear well dictionary
+		self.well_dict.clear()
+		self.well_idx = 0
+
+		# reset TubeToWell object
+		self.ttw.reset()
 
 # PlateLighting(A1_X, A1_Y, CIRC_RADIUIS, WELL_SPACING).show()
 def main():

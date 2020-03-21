@@ -23,14 +23,17 @@ class ConfirmPopup(Popup):
 	def show(self):
 		content = BoxLayout(orientation='vertical')
 		popup_lb = Label(text='Finish plate?', font_size = 30)
-		# title = 'Confirm exit'
 		content.add_widget(popup_lb)
 		button_box = BoxLayout(orientation='horizontal', size_hint=(1, .4))
 		content.add_widget(button_box)
-		yes_button = Button(text='yes')
-		button_box.add_widget(yes_button)
-		yes_button.bind(on_press=self.yes_callback)
 
+		# configure yes button
+		self.yes_button = Button(text='yes')
+		button_box.add_widget(self.yes_button)
+		self.yes_button.bind(on_press=self.yes_callback)
+		self.yes_button.bind(on_press=self.dismiss)
+
+		# configure no button
 		no_button = Button(text='no')
 		button_box.add_widget(no_button)
 		no_button.bind(on_press=self.dismiss)
@@ -42,7 +45,7 @@ class ConfirmPopup(Popup):
 		if self.txt_file_path:
 			txt_file = open(self.txt_file_path,"w") 
 			txt_file.close() 
-		WellLitApp.get_running_app().stop()
+		WellLitApp.get_running_app().p.resetAll()
 
 class WellLitPopup(Popup):
 	def __init__(self):
@@ -83,8 +86,8 @@ class WellPlot(BoxLayout):
 
 class WellLitApp(App):
 	def build(self):
-		p = PLWidget()
-		return p
+		self.p = PLWidget()
+		return self.p
 
 class PLWidget(BoxLayout):
 	def __init__(self, **kwargs):
@@ -98,12 +101,9 @@ class PLWidget(BoxLayout):
 		self.warningsMade = False
 		self.confirm_popup = ConfirmPopup()
 		
-
-	''' CALLBACKS '''
 	def makeWarningFile(self):
 		# set up path to save warnings
 		self.warningsMade = True
-		 # TODO: check if folder exists and make it
 		self.warning_file_path = os.path.join(self.plateLighting.ttw.csv_file_path +'_WARNING')
 		self.warning_metadata = self.plateLighting.ttw.metadata
 
@@ -117,11 +117,11 @@ class PLWidget(BoxLayout):
 		if not self.canUndo:
 			self.error_popup.title =  "Invalid Action"
 			self.error_popup.show('Cannot undo')
-			# self.ids.textbox.text = ''
 
 		elif self.scanMode and self.plateLighting.ttw.scanned_tubes:
 			if not self.warningsMade:
 				self.makeWarningFile()
+
 			# remove last row from CSV file
 			original_rows = []
 			with open(self.plateLighting.ttw.csv_file_path+'.csv', 'r') as csvFile:
@@ -134,17 +134,18 @@ class PLWidget(BoxLayout):
 				writer.writerows(original_rows_edited)
 				csvFile.close()
 
+			# clear the target on the plate lighting plot
 			self.plateLighting.target.markEmpty()
 			self.plateLighting.fig.canvas.draw()
 
+			# move back one index the TubeToWell and PlateLighting objects
 			self.plateLighting.ttw.scanned_tubes = self.plateLighting.ttw.scanned_tubes[:-1]
 			undone_barcode = self.plateLighting.target.barcode
 			undone_location = self.plateLighting.ttw.tube_locations[undone_barcode]
 			self.plateLighting.ttw.tube_locations[undone_barcode] = ''
 			self.plateLighting.well_idx -= 1
 			self.plateLighting.ttw.current_idx -=1
-			self.canUndo = False 
-
+			self.canUndo = False # do not allow the user to undo more than once in a row
 
 
 			# write to warning file
@@ -155,17 +156,47 @@ class PLWidget(BoxLayout):
 				writer.writerows(warning_row)
 				csvFile.close()
 
+			# show popup confirming that the tube was unscanned
 			self.error_popup.title =  "Notification"
 			self.ids.tube_barcode_label.text = '' 
 			self.error_popup.show('Tube Unscanned')
 
+			self.ids.notificationLabel.font_size = 50
+			self.ids.notificationLabel.text = 'Please scan tube'
+
+
 		else:
+			# show popup telling the user they cannot undo
 			self.error_popup.title =  "Invalid Action"
 			self.error_popup.show('Nothing to undo')
 			self.ids.textbox.text = ''
 
 	def finishPlate(self):
 		self.confirm_popup.show()
+		# self.resetAll()
+
+		# reset PlateLighting object
+
+	def resetAll(self): 
+		self.plateLighting.reset()
+		
+		# restart metadata collection
+		self.ids.textbox.funbind('on_text_validate',self.switchWell)
+		self.ids.textbox.funbind('on_text_validate',self.scanAliquoter)
+		self.ids.textbox.funbind('on_text_validate',self.scanPlate)
+		self.ids.textbox.bind(on_text_validate=self.scanRecorder)
+		self.ids.notificationLabel.text = "Please scan the recorder's barcode"
+
+		# reset metadata text
+		self.ids.recorder_label.text = '[b]Recorder:[/b] \n'
+		self.ids.aliquoter_label.text = '[b]Aliquoter:[/b] \n'
+		self.ids.plate_barcode_label.text = '[b]Plate Barcode:[/b] \n'
+		self.ids.tube_barcode_label.text = '[b]Tube Barcode:[/b] \n'
+		self.ids.notificationLabel.font_size = 50
+
+		self.scanMode = False
+		self.canUndo = False
+		self.warningsMade = False
 
 	def showBarcodeError(self, barcode_type):
 		self.error_popup.title =  "Barcode Error"

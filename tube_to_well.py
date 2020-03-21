@@ -22,7 +22,7 @@ class TubeToWell:
 		for i in range(1,13):
 			for letter in self.well_rows:
 				self.well_names.append(letter+str(i))
-		self.well_names_iterator = iter(self.well_names)
+		# targer well index
 		self.current_idx = 0
 
 		# make a dictionary with the tube locations as the key and the barcodes as the value
@@ -51,28 +51,28 @@ class TubeToWell:
 		self.plate_barcode = plate_barcode
 
 	def isPlate(self, check_input):
-		if re.match(r'SP[0-9]{6}$', check_input) or check_input == 'MANUAL EDIT':
+		if re.match(r'SP[0-9]{6}$', check_input) or check_input == 'EDIT':
 			return True
 		return False
 
 	def isName(self, check_input):
 		if any(char.isdigit() for char in check_input):
 			return False
-		elif check_input == 'MANUAL EDIT':
+		elif check_input == 'EDIT':
 			return True
 		return True
 
 	def isTube(self, check_input):
 		if re.match(r'[A-Z][0-9]{1,5}$', check_input):
 			return True
-		elif check_input == 'CONTROL' or check_input == 'MANUAL EDIT' :
+		elif check_input == 'CONTROL' or check_input == 'EDIT' :
 			return True
 		return False
 
 	def checkTubeBarcode(self, check_input):
 
 		# check if the barcode was already scanned
-		if check_input in self.scanned_tubes and check_input != 'CONTROL' and check_input != 'MANUAL EDIT':
+		if check_input in self.scanned_tubes and check_input != 'CONTROL' and check_input != 'EDIT':
 			print('this tube was already scanned')
 			return False
 			# light up corresponding well
@@ -95,4 +95,14 @@ class TubeToWell:
 			self.tube_locations[check_input] = location
 			# print (location)
 			return location
+
+	def reset(self):
+		# clear tube locations
+		for w in self.well_names:
+			self.tube_locations[w] = None
+		# reset index
+		self.current_idx = 0
+
+		# reset scanned tubes
+		self.scanned_tubes.clear()
 
