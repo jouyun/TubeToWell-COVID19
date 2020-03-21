@@ -78,6 +78,8 @@ class WellPlot(BoxLayout):
 		CIRC_RADIUIS  = 0.024
 		self.pl = PlateLighting(A1_X, A1_Y, CIRC_RADIUIS, WELL_SPACING)
 		self.add_widget(FigureCanvasKivyAgg(figure=self.pl.fig))
+	def on_touch_down(self, touch):
+		pass
 
 class WellLitApp(App):
 	def build(self):
