@@ -1,3 +1,3 @@
 call activate WellLit
-python C:\Users\joana.cabrera\Documents\GitHub\TubeToWell-COVID19\WellLitGUI.py
+python C:\Users\wellituser\Desktop\TubeToWell-COVID19\WellLitGUI.py
 pause

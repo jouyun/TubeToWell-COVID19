@@ -37,8 +37,8 @@ class TubeToWell:
 		self.aliquoter = aliquoter
 		self.recorder = recorder
 		self.plate_timestr = time.strftime("%Y%m%d-%H%M%S")
-		self.cwd = os.getcwd()
-		self.csv_folder_path = os.path.join(self.cwd, 'well_locations_csv')
+		# self.cwd = os.getcwd()
+		self.csv_folder_path = 'C:\\Users\\wellituser\\Google Drive\\Plate Layouts\\WellLit'
 		if not os.path.exists(self.csv_folder_path):
 			os.makedirs(self.csv_folder_path)
 		self.csv_file_path = os.path.join(self.csv_folder_path, self.plate_timestr + '_' + plate_barcode + '_tube_to_plate')
@@ -63,7 +63,7 @@ class TubeToWell:
 		return True
 
 	def isTube(self, check_input):
-		if re.match(r'[A-Z][0-9]{1,5}$', check_input):
+		if re.match(r'[A-Z][0-9]{1,5}', check_input):
 			return True
 		elif check_input == 'CONTROL' or check_input == 'EDIT' :
 			return True

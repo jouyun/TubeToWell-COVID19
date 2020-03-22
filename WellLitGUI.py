@@ -272,5 +272,5 @@ class PLWidget(BoxLayout):
 		
 if __name__ == '__main__':
 	Window.size =(1600,1200)
-	# Window.fullscreen = True
+	Window.fullscreen = True
 	WellLitApp().run()
