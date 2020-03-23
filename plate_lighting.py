@@ -1,4 +1,7 @@
 #!/usr/bin/env python3
+
+# Joana Cabrera
+# 3/15/2020 
 import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.patches import Circle
@@ -6,43 +9,41 @@ import time
 import matplotlib as mpl
 from tube_to_well import *
 
-# put this into a state machine later
+# TODO: put this into a state machine later
 # if layout changes, use lighting location to find A1 and spacing
-A1_X = 0.23
-A1_Y = 0.435
+A1_X = 0.235
+A1_Y = 0.59
 WELL_SPACING = 0.045
-CIRC_RADIUIS  = 0.023
-
+CIRC_RADIUIS  = 0.024
 
 class Well:
+	""" A class for individual wells in the matplotlib plot
+	"""
 	def __init__(self, center, radius):
-		self.target = False
 		self.center = center
 		self.radius = radius
 		self.circle = Circle(self.center, self.radius, color='gray', zorder=0)
 		self.barcode = ''
 
 	def markEmpty(self):
-		self.target = False
 		self.circle.set_color('gray')
+		self.circle.zorder=0
 		
-
 	def markFilled(self):
-		self.target = False
 		self.circle.set_color('red')
-		
-
-	def markTarget(self):
-		self.target = True
-		self.circle.set_color('yellow')
 		self.circle.zorder=1
 
+	def markTarget(self):
+		self.circle.set_color('yellow')
+		self.circle.zorder=2
+
 	def markRescanned(self):
-		self.target = False
 		self.circle.set_color('blue')
 		self.circle.zorder=2
 
 class PlateLighting:
+	""" A class for lighting up the corresponding well using matplotlib
+	"""
 	def __init__(self, a1_x, a1_y, circ_radius, well_spacing):
 
 		# set up plot 
@@ -53,8 +54,7 @@ class PlateLighting:
 		self.ax.axis('equal')
 		self.fig.subplots_adjust(bottom=0)
 		self.ax.axis('off')
-		self.fig.canvas.manager.full_screen_toggle() # make sure to set the well lighting display as the main display (go to windows display setting)
-		self.well_dict = {}
+		self.well_dict = {} # links barcode to Well object
 
 		# set up tube to well
 		self.ttw = TubeToWell()
@@ -68,43 +68,53 @@ class PlateLighting:
 				well = Well((x_coord,y_coord), circ_radius)
 				self.wells.append(well)
 				self.ax.add_artist(well.circle)
-		self.wells_iterator = iter(self.wells)
+		
+		# keep track of target index
+		self.well_idx = 0
 
-		self.check_input = ''
-		self.fig.canvas.mpl_connect('key_press_event', self.on_trigger)
 
-	def on_trigger(self, event):
-		# compile the full barcode onto check_input
-		if event.key != 'enter':
-			self.check_input += event.key
-		if event.key == 'enter':
-			# check if it was a valid barcode (either have all the accessed barcodes or make sure input comes from a barcode scanner)
-			if self.ttw.checkBarcode(self.check_input):
-				target = next(self.wells_iterator)
-				target.markTarget()
-				target.barcode = self.check_input
-				self.fig.canvas.draw()
+	def switchWell(self, check_input):
+		location = self.ttw.checkTubeBarcode(check_input)
+		if location:
+			self.target = self.wells[self.well_idx]
+			self.well_idx += 1
+			self.target.markTarget()
+			self.target.location = location
+			self.target.barcode = check_input
+			self.fig.canvas.draw()
 
-				# the well will be marked as filled when the next target is marked 
-				target.markFilled()
-				target.barcode = self.check_input
-				
-				self.well_dict[target.barcode] = target
+			# the well will be marked as filled when the next target is marked 
+			self.target.markFilled()
 
-			elif self.check_input in self.ttw.scanned_tubes:
-				already_scanned_tube = self.well_dict[self.check_input]
-				print(already_scanned_tube)
-				already_scanned_tube.markRescanned()
-				self.fig.canvas.draw()
-				
-				# the well will be marked as filled when the next target is marked 
-				already_scanned_tube.markFilled()
+			# link target well object to a barcode in the well_dict dictonary
+			self.well_dict[self.target.barcode] = self.target
 
-			self.check_input = ''
+			return True # return true if new tube
+
+		elif check_input in self.ttw.scanned_tubes:
+			already_scanned_tube = self.well_dict[check_input]
+			already_scanned_tube.markRescanned()
+			self.fig.canvas.draw()
+			
+			# the well will be marked as filled when the next target is marked 
+			already_scanned_tube.markFilled()
+			return False # return false if not new tube
 
 	def show(self):
 		plt.show()
 
+	def reset(self):
+		# mark all wells as empty
+		for w in self.wells:
+			w.markEmpty()
+		self.fig.canvas.draw()
+
+		# clear well dictionary
+		self.well_dict.clear()
+		self.well_idx = 0
+
+		# reset TubeToWell object
+		self.ttw.reset()
 
 # PlateLighting(A1_X, A1_Y, CIRC_RADIUIS, WELL_SPACING).show()
 def main():

@@ -1,0 +1,78 @@
+#:kivy 1.11.1
+#:import FigureCanvasKivyAgg kivy.garden.matplotlib.backend_kivyagg
+#:import plt matplotlib.pyplot
+
+<ConfirmPopup>:
+	size_hint: None,None
+	height: 400
+	width: 500
+	title: 'Confirm exit'
+
+<WellLitPopup>:
+	size_hint: None,None
+	height: 400
+	width: 800
+
+<MetaLabel>:
+	text_size: self.size
+	halign: 'left'
+	padding_x: 5
+	markup: True
+	font_size: 20
+<Button>
+	font_size: 30
+
+
+<PLWidget>:
+	orientation: 'vertical'
+	BoxLayout:
+		orientation: 'horizontal'
+		size_hint_y: None
+		height: 400
+		BoxLayout:
+			size_hint_x: None
+    		width: 300
+			id: metadata_box
+			orientation: 'vertical'
+			MetaLabel:
+				id: recorder_label
+				text: '[b]Recorder:[/b] \n'
+			MetaLabel:
+				id: aliquoter_label
+				text: '[b]Aliquoter:[/b] \n'
+			MetaLabel:
+				id: plate_barcode_label
+				text: '[b]Plate Barcode:[/b] \n'
+			MetaLabel: 
+				text: '[b]Tube Barcode:[/b]'
+			MetaLabel:
+				id: tube_barcode_label
+				font_size: 50
+			Label:
+				size_hint_y: 1.5
+
+	    Label:
+	    	id: notificationLabel
+	        text: "Please scan the recorder's barcode"
+	        font_size: 50
+	        bold: True
+    	BoxLayout:
+    		size_hint_x: None
+    		width: 300
+		    orientation: 'vertical'
+		    id: button_box
+		    TextInput:
+		    	id: textbox
+		    	multiline: False
+		    	size_hint_y: .5
+		    	focus: True
+		    Button:
+		    	text: 'Undo Last Tube'
+		    	on_press: root.undoTube()
+		    Button:
+		    	text: 'Finish Plate'
+		    	on_press: root.finishPlate()
+	WellPlot:
+		id: wellPlot
+
+		
