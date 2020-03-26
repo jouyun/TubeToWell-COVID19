@@ -1,6 +1,6 @@
 # TubeToWell-COVID19
 
-## Instructions for Windows
+## Installation Instructions for Windows
 1. Install Anaconda (tested on version 4.8.3)
 2. Make anaconda environment:
         Open up anaconda prompt and type: `conda create -n WellLit python=3.7.6`
