@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 # Joana Cabrera
 # 3/15/2020
 
@@ -13,6 +14,7 @@ from kivy.uix.label import Label
 from kivy.uix.popup import Popup
 from kivy.uix.button import Button
 import time
+import json
 
 class ConfirmPopup(Popup):
 	def __init__(self, txt_file_path=None):
@@ -75,13 +77,23 @@ def on_focus(instance, value):
 class WellPlot(BoxLayout):
 	def __init__(self, **kwargs):
 		super(WellPlot, self).__init__(**kwargs)
-		A1_X = 0.235
-		A1_Y = 0.59
-		WELL_SPACING = 0.045
-		CIRC_RADIUIS  = 0.024
+
+		# load configs
+		self.cwd = os.getcwd()
+		self.config_path = os.path.join(self.cwd, "wellLitConfig.json")
+		with open(self.config_path) as json_file:
+			self.configs = json.load(json_file)
+		A1_X = self.configs["A1_X"]
+		A1_Y = self.configs["A1_Y"]
+		WELL_SPACING = self.configs["WELL_SPACING"]
+		CIRC_RADIUIS  = self.configs["CIRC_RADIUIS"]
+
+		# set up PlateLighting object
 		self.pl = PlateLighting(A1_X, A1_Y, CIRC_RADIUIS, WELL_SPACING)
 		self.add_widget(FigureCanvasKivyAgg(figure=self.pl.fig))
+
 	def on_touch_down(self, touch):
+		# this method keeps the app from crashing if the plot is clicked on
 		pass
 
 class WellLitApp(App):
@@ -173,9 +185,6 @@ class PLWidget(BoxLayout):
 
 	def finishPlate(self):
 		self.confirm_popup.show()
-		# self.resetAll()
-
-		# reset PlateLighting object
 
 	def resetAll(self): 
 		self.plateLighting.reset()
