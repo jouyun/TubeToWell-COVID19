@@ -186,6 +186,27 @@ class PLWidget(BoxLayout):
 	def finishPlate(self):
 		self.confirm_popup.show()
 
+	# Things I don't know:
+	# - where to call this
+	# - whether this def belongs here in this class
+	# 
+	# Input: source (numpy array)
+	# Output: destination (numpy array)
+	#         with wells from source tightly packed
+	def plateToPlate(self, source):
+		row_ind = 0
+		col_ind = 0
+		for row in source:
+			for element in row:
+				if element:
+					destination[row_ind][col_ind] = element
+					row_ind += 1
+					col_ind += 1
+					if row_ind > (len(source) - 1):
+						row_ind = 0
+						col_ind += 1
+		return destination
+
 	def resetAll(self): 
 		self.plateLighting.reset()
 		
