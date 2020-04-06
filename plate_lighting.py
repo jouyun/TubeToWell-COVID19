@@ -4,47 +4,44 @@
 # 3/15/2020 
 import numpy as np
 import matplotlib.pyplot as plt
-from matplotlib.patches import Circle
+from matplotlib.patches import Circle, Rectangle
 import time
 import matplotlib as mpl
 from tube_to_well import *
 
-# TODO: put this into a state machine later
-# if layout changes, use lighting location to find A1 and spacing
-A1_X = 0.235
-A1_Y = 0.59
-WELL_SPACING = 0.045
-CIRC_RADIUIS  = 0.024
 
 class Well:
 	""" A class for individual wells in the matplotlib plot
 	"""
-	def __init__(self, center, radius):
+	def __init__(self, center, shape, size_param):
 		self.center = center
-		self.radius = radius
-		self.circle = Circle(self.center, self.radius, color='gray', zorder=0)
+		self.size_param = size_param
+		if shape == 'circle':
+			self.marker = Circle(self.center, radius=size_param, color='gray', zorder=0)
+		elif shape == 'square':
+			self.marker = Rectangle(self.center, width=size_param, height=size_param, color = 'gray', zorder=0)
 		self.barcode = ''
 
 	def markEmpty(self):
-		self.circle.set_color('gray')
-		self.circle.zorder=0
+		self.marker.set_color('gray')
+		self.marker.zorder=0
 		
 	def markFilled(self):
-		self.circle.set_color('red')
-		self.circle.zorder=1
+		self.marker.set_color('red')
+		self.marker.zorder=1
 
 	def markTarget(self):
-		self.circle.set_color('yellow')
-		self.circle.zorder=2
+		self.marker.set_color('yellow')
+		self.marker.zorder=2
 
 	def markRescanned(self):
-		self.circle.set_color('blue')
-		self.circle.zorder=2
+		self.marker.set_color('blue')
+		self.marker.zorder=2
 
 class PlateLighting:
 	""" A class for lighting up the corresponding well using matplotlib
 	"""
-	def __init__(self, a1_x, a1_y, circ_radius, well_spacing):
+	def __init__(self, a1_x, a1_y, shape, size_param, well_spacing):
 
 		# set up plot 
 		mpl.rcParams['toolbar'] = 'None'
@@ -61,17 +58,19 @@ class PlateLighting:
 
 		# draw all the empty wells
 		self.wells = [] # column wise list of wells
+
+		# load config file
+
 		for x in range(12):
 			x_coord = a1_x + (well_spacing * x)
 			for y in range(8):
 				y_coord = a1_y - (well_spacing * y)
-				well = Well((x_coord,y_coord), circ_radius)
+				well = Well((x_coord,y_coord), shape, size_param)
 				self.wells.append(well)
-				self.ax.add_artist(well.circle)
+				self.ax.add_artist(well.marker)
 		
 		# keep track of target index
 		self.well_idx = 0
-
 
 	def switchWell(self, check_input):
 		location = self.ttw.checkTubeBarcode(check_input)
@@ -115,10 +114,3 @@ class PlateLighting:
 
 		# reset TubeToWell object
 		self.ttw.reset()
-
-# PlateLighting(A1_X, A1_Y, CIRC_RADIUIS, WELL_SPACING).show()
-def main():
-	PlateLighting(A1_X, A1_Y, CIRC_RADIUIS, WELL_SPACING).show()
-
-if __name__== "__main__":
-	main()

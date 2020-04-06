@@ -3,5 +3,7 @@
     "A1_X": 0.235,
     "A1_Y": 0.59,
     "WELL_SPACING": 0.045,
-    "CIRC_RADIUIS": 0.024
+    "MARKER_SHAPE": "square",
+    "CIRC_RADIUIS": 0.024,
+    "SQUARE_LENGTH": 0.04
 }

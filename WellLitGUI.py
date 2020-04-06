@@ -86,10 +86,15 @@ class WellPlot(BoxLayout):
 		A1_X = self.configs["A1_X"]
 		A1_Y = self.configs["A1_Y"]
 		WELL_SPACING = self.configs["WELL_SPACING"]
-		CIRC_RADIUIS  = self.configs["CIRC_RADIUIS"]
+		SHAPE = self.configs["MARKER_SHAPE"]
+		if SHAPE == 'circle':
+			SIZE_PARAM = self.configs["CIRC_RADIUIS"]
+			SHAPE = self.configs["MARKER_SHAPE"]
+		elif SHAPE == 'square':
+			SIZE_PARAM = self.configs["SQUARE_LENGTH"]
 
 		# set up PlateLighting object
-		self.pl = PlateLighting(A1_X, A1_Y, CIRC_RADIUIS, WELL_SPACING)
+		self.pl = PlateLighting(A1_X, A1_Y, SHAPE, SIZE_PARAM, WELL_SPACING)
 		self.add_widget(FigureCanvasKivyAgg(figure=self.pl.fig))
 
 	def on_touch_down(self, touch):
