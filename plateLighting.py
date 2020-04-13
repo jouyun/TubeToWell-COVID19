@@ -7,7 +7,7 @@ import matplotlib.pyplot as plt
 from matplotlib.patches import Circle, Rectangle
 import time
 import matplotlib as mpl
-from tube_to_well import *
+from tubeToWell import *
 
 
 class Well:
