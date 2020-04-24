@@ -65,7 +65,7 @@ class TubeToWell:
 
 
 	def isPlate(self, check_input):
-		if re.match(r'SP[0-9]{6}$', check_input) or check_input == 'EDIT':
+		if re.match(r'TS[0-9]{1,8}$', check_input) or check_input == 'EDIT':
 			return True
 		return False
 
@@ -77,7 +77,7 @@ class TubeToWell:
 		return True
 
 	def isTube(self, check_input):
-		if re.match(r'[A-Z][0-9]{1,5}', check_input):
+		if re.match(r'[A-Z]{6}$', check_input):
 			return True
 		elif check_input == 'CONTROL' or check_input == 'EDIT' :
 			return True
