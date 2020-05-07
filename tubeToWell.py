@@ -77,7 +77,7 @@ class TubeToWell:
 		return True
 
 	def isTube(self, check_input):
-		if re.match(r'[A-Z][0-9]{1,5}', check_input):
+		if re.match(r'[A-Z][0-9]{8}', check_input):
 			return True
 		elif check_input == 'CONTROL' or check_input == 'EDIT' :
 			return True

@@ -195,7 +195,7 @@ class PLWidget(BoxLayout):
 		self.plateLighting.reset()
 		
 		# restart metadata collection
-		self.ids.textbox.funbind('on_text_validate',self.switchWell)
+		self.ids.textbox.funbind('text',self.switchWell)
 		self.ids.textbox.funbind('on_text_validate',self.scanAliquoter)
 		self.ids.textbox.funbind('on_text_validate',self.scanPlate)
 		self.ids.textbox.bind(on_text_validate=self.scanRecorder)
@@ -262,15 +262,30 @@ class PLWidget(BoxLayout):
 
 			# bind textbox to switchwell after barcode is scanned
 			self.ids.textbox.funbind('on_text_validate',self.scanPlate)
-			self.ids.textbox.bind(on_text_validate=self.switchWell)
+			self.ids.textbox.bind(text=self.switchWell)
 
 			self.ids.notificationLabel.text = 'Please scan tube'
 			self.scanMode = True
 
 		else: 
 			self.showBarcodeError('plate')
-
 	def switchWell(self, *args):
+		check_input = self.ids.textbox.text 
+		print(check_input)
+
+		# switch well if it is a new tube
+		if self.plateLighting.ttw.isTube(check_input):
+			self.ids.tube_barcode_label.text = check_input
+			self.canUndo = self.plateLighting.switchWell(check_input) # can only undo if it's a new target
+			self.ids.notificationLabel.font_size = 100
+			self.ids.notificationLabel.text = self.plateLighting.well_dict[check_input].location
+			print(self.plateLighting.well_dict[check_input].location)
+			self.ids.textbox.text = '' #clear textbox after scan
+		else: 
+			print('')
+			#self.showBarcodeError('tube')
+
+	def Real_switchWell(self, *args):
 		check_input = self.ids.textbox.text 
 
 		# switch well if it is a new tube
